@@ -26,12 +26,12 @@ To support ongoing operations, DataONE offers paid services for memberships. Thi
     class Quota {
     }
     
-    Subscription "1" --o "1" Product : "associated with"
-    Plan "1" o-right- "1" Subscription : "contains"
-    Customer "1" -right-o "1" Subscription : "associated with"
-    Customer "1" --o "n" Order : "associated with"
-    Order "0" -right-o "n" Product : "contains"
-    Product "0"--o "n" Quota : "contains"
+    Subscription "1" --o "1" Product : "   associated with"
+    Plan "1" -left-o "1" Subscription : "associated with"
+    Customer "1" o-left- "1" Subscription : "associated with"
+    Customer "1" --o "n" Order : "   associated with"
+    Order "0" -right-o "n" Product : "associated with"
+    Product "0"--o "n" Quota : "   associated with"
     
     @enduml
     
