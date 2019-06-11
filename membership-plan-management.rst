@@ -7,7 +7,35 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships.  This document outlines the design and implementation details needed to offer these services.  It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track in order to know who has subscribed to Membership Plans, what Products the Plans include, what additional Products they add into their Order, and what Quota limits are set per Product.  The details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+To support ongoing operations, DataONE offers paid services for memberships. This document outlines the design and implementation details needed to offer these services. It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track in order to know who has subscribed to Membership Plans, what Products the Plans include, what additional Products they add into their Order, and what Quota limits are set per Product. The details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+
+..
+    @startuml images/overview.png
+    !include ./plantuml-styles.txt
+    'left to right direction
+    class Plan {
+    }
+    class Product {
+    }
+    class Subscription {
+    }
+    class Customer {
+    }
+    class Order {
+    }
+    class Quota {
+    }
+    
+    Subscription "1" --o "1" Product : "associated with"
+    Plan "1" o-right- "1" Subscription : "contains"
+    Customer "1" -right-o "1" Subscription : "associated with"
+    Customer "1" --o "n" Order : "associated with"
+    Order "0" -right-o "n" Product : "contains"
+    Product "0"--o "n" Quota : "contains"
+    
+    @enduml
+    
+.. image:: images/overview.png
 
 Plans
 -----
@@ -41,6 +69,11 @@ A Plan is based on a particular Product, identified by the product ID.  The asso
     @enduml
 
 .. image:: images/plan.png
+
+
+To support ongoing operations, DataONE offers paid services for memberships.  This document outlines the design and implementation details needed to offer these services.  It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track in order to know who has subscribed to Membership Plans, what Products the Plans include, what additional Products they add into their Order, and what Quota limits are set per Product.  The details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+
+The following diagram gives an overview of the relationships among the types of information stored:
 
 An example Plan:
 
