@@ -215,7 +215,7 @@ An example Product:
                 },
                 {
                     "name": "dataone_voting_member",
-                    "label": "Custom Quality Metrics",
+                    "label": "DataONE Voting Member",
                     "description": "Vote on the direction and priorities at DataONE Community meetings."
                 }
             ]
