@@ -92,7 +92,7 @@ An example Plan:
 Subscriptions
 -------------
 
-Subscriptions are products that are billed on a recurring basis, and associate a Customer with a particular Plan, or a list of Plans.  Subscriptions have creation, start, end and cancel dates used to keep track of the status of the Subscription.  The status field changes based on timely payment of the latest Invoice associated with the Subscription.  Individual Subscriptions can be accessed by the Customer or by an administrator.
+Subscriptions are products that are billed on a recurring basis, and associate a Customer with a particular Plan.  Subscriptions have creation, start, end and cancel dates used to keep track of the status of the Subscription.  The status field changes based on timely payment of the latest Invoice associated with the Subscription.  Individual Subscriptions can be accessed by the Customer or by an administrator.
 
 ..
     @startuml images/subscription.png
