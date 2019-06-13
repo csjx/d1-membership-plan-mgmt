@@ -7,7 +7,18 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships. This document outlines the design and implementation details needed to offer these services. It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track in order to know who has subscribed to Membership Plans, what Products the Plans include, what additional Products they add into their Order, and what Quota limits are set per Product. The details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+To support ongoing operations, DataONE offers paid services for memberships. This document outlines the design and implementation details needed to offer these services. It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track. This documents:
+
+- who has subscribed to Membership Plans
+- what Products the Plans include
+- what additional Products they add into their Order
+- what Invoices have been sent for an Order
+- which payment Charge(s) completed the Order
+- what Quota limits are set per Product.
+
+Details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+
+The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
 ..
     @startuml images/overview.png
@@ -23,6 +34,10 @@ To support ongoing operations, DataONE offers paid services for memberships. Thi
     }
     class Order {
     }
+    class Invoice {
+    }
+    class Charge {
+    }
     class Quota {
     }
     
@@ -31,6 +46,8 @@ To support ongoing operations, DataONE offers paid services for memberships. Thi
     Customer "1" o-left- "1" Subscription : "associated with"
     Customer "1" --o "n" Order : "   associated with"
     Order "0" -right-o "n" Product : "associated with"
+    Order "1" -up-o "n" Charge : "   associated with"
+    Order "1" -left-o "n" Invoice : "   associated with"
     Product "0"--o "n" Quota : "   associated with"
     
     @enduml
@@ -128,7 +145,7 @@ Subscriptions are products that are billed on a recurring basis, and associate a
 Products
 --------
 
-Products define the exact DataONE service (or goods) offered, and describe the features of the service using the extensible ``metadata`` field.  Each Product is unique, and can be tied to multiple pricing Plans.
+Products define the exact DataONE service (or goods) offered, and describe the features of the service using the extensible ``metadata`` field.  Each Product is unique, and can be tied to multiple pricing Plans.  Other Products offered are not tied to Plans, but may be part of any Order (a la cart).  DataONE keeps a catalog of Products offered over time which may be listed by client applications.
 
 ..
     @startuml images/product.png
@@ -208,7 +225,7 @@ An example Product:
 Customers
 ---------
 
-Customers are associated with a DataONE account (by ORCID), and track the charges for the individual customer.
+Customers are associated with a DataONE account (by ORCID), and are associated with Subscriptions, Orders, Invoices, Charges, and Quotas based on certain purchased Products.
  
 Quotas
 ------
@@ -223,4 +240,33 @@ Orders track Customer purchases of a list of Products, and the total amount of t
 Charges
 -------
 
-Charges track charge events against a given payment source, like a credit card.  While DataONE won't track payment sources, we will track Charge events by ID as part of an Order.
+Charges document transactions against a given payment source, like a credit card.  While DataONE won't track payment sources, we will track Charge events by ID as part of an Order.
+
+..
+    @startuml images/charge.png
+    !include ./plantuml-styles.txt
+
+    class Charge {
+        id: string
+        object: string
+        amount: integer
+        amount_refunded: integer
+        created: timestamp
+        currency: string
+        customer: string
+        description: string
+        failure_code: string
+        invoice: string
+        metadata: hash
+        order: string
+        outcome: string
+        paid: boolean
+        receipt_email: string
+        refunded: boolean
+        refunds: list
+        status: string
+    }
+    @enduml
+
+.. image:: images/charge.png
+
