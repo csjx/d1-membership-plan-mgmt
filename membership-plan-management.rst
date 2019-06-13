@@ -208,8 +208,19 @@ An example Product:
 Customers
 ---------
 
+Customers are associated with a DataONE account (by ORCID), and track the charges for the individual customer.
+ 
 Quotas
 ------
 
+Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. and track the total usage in each category for each Customer.
+
 Orders
 ------
+
+Orders track Customer purchases of a list of Products, and the total amount of the Order that was charged in a Charge.
+
+Charges
+-------
+
+Charges track charge events against a given payment source, like a credit card.  While DataONE won't track payment sources, we will track Charge events by ID as part of an Order.
