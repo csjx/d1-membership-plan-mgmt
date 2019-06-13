@@ -16,7 +16,7 @@ To support ongoing operations, DataONE offers paid services for memberships. Thi
 - which payment Charge(s) completed the Order
 - what Quota limits are set per Product.
 
-Details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
+Details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service. Personally identifiable information that is stored will be limited to names, emails, and addresses, but will exclude financial transaction details (credit cards, etc.) other than the results of the Charge transactions.
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
