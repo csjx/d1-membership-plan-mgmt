@@ -70,11 +70,6 @@ A Plan is based on a particular Product, identified by the product ID.  The asso
 
 .. image:: images/plan.png
 
-
-To support ongoing operations, DataONE offers paid services for memberships.  This document outlines the design and implementation details needed to offer these services.  It describes the Plans, Subscriptions, Products, Customers, Quotas and Orders that DataONE needs to track in order to know who has subscribed to Membership Plans, what Products the Plans include, what additional Products they add into their Order, and what Quota limits are set per Product.  The details of how the payment will be collected is to be determined, but will involve the UCSB extramural funds payment service.
-
-The following diagram gives an overview of the relationships among the types of information stored:
-
 An example Plan:
 
 .. code:: json
