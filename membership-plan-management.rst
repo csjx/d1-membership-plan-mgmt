@@ -227,6 +227,33 @@ Customers
 
 Customers are associated with a DataONE account (by ORCID), and are associated with Subscriptions, Orders, Invoices, Charges, and Quotas based on certain purchased Products.
  
+..
+    @startuml images/customer.png
+    !include ./plantuml-styles.txt
+
+    class Customer {
+        id: string
+        object: string
+        balance: integer
+        address: hash
+        created: timestamp
+        currency: string
+        delinquent: boolean
+        description: string
+        discount: hash
+        email: string
+        invoice_prefix: string
+        invoice_settings: hash
+        metadata: hashes
+        name: string
+        phone: string
+        subscriptions: list
+        tax_exempt: string
+    }
+    @enduml
+
+.. image:: images/customer.png
+
 Quotas
 ------
 
