@@ -164,6 +164,7 @@ Products define the exact DataONE service offered, and describe the features of 
         unit_label: string
         url: string
         metadata: hash
+        quotas: list
     }
     @enduml
 
@@ -257,7 +258,23 @@ Customers are associated with a DataONE account (by ORCID), and are associated w
 Quotas
 ------
 
-Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. and track the total usage in each category for each Customer.
+Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. Quotas have a soft and hard limit per unit to help with communicating limit warnings.
+
+..
+    @startuml images/quota.png
+    !include ./plantuml-styles.txt
+
+    class Quota {
+        id: string
+        object: string
+        name: string
+        soft_limit: integer
+        hard_limit: integer
+        unit: string
+    }
+    @enduml
+
+.. image:: images/quota.png
 
 Orders
 ------
