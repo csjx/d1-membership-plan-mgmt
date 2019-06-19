@@ -237,6 +237,30 @@ Orders
 
 Orders track Customer purchases of a list of Products, and the total amount of the Order that was charged in a Charge.
 
+..
+    @startuml images/order.png
+    !include ./plantuml-styles.txt
+
+    class Order {
+        id: string
+        object: string
+        amount: integer
+        amount_returned: integer
+        charge: string
+        created: timestamp
+        currency: string
+        customer: string
+        email: string
+        items: array of hashes
+        metadata: hash
+        status: string
+        status_transitions: hash
+        updated: timestamp
+    }
+    @enduml
+
+.. image:: images/order.png
+
 Charges
 -------
 
