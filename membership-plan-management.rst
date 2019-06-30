@@ -37,9 +37,10 @@ The following diagram shows the membership and payment records stored by DataONE
     
     Customer "1" --o "n" Order : "   associated with"
     Order "0" -right-o "n" Product : "associated with"
-    Order "1" -up-o "n" Charge : "   associated with"
+    Order "0" -up-o "n" Charge : "   associated with"
     Order "1" -left-o "n" Invoice : "   associated with"
-    Product "0"--o "n" Quota : "   associated with"
+    Customer "0"-right-o "n" Quota : "   associated with"
+    Product "0"-down-o "n" Quota : "   associated with"
     
     @enduml
     
@@ -95,7 +96,13 @@ An example Product:
                     "name": "custom_portal",
                     "label": "Branded Portals",
                     "description": "Showcase your research, data, results, and usage metrics by building a custom web portal.",
-                    "count": 3
+                    "quota": {
+                        "object": "quota"
+                        "name": "custom_portal_count"
+                        "soft_limit": "3"
+                        "hard_limit": "3"
+                        "unit": "portal"
+                    }
                 },
                 {
                     "name": "custom_search_filters",
