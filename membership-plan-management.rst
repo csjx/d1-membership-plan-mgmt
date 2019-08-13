@@ -63,9 +63,9 @@ Products define the exact DataONE service offered, and describe the features of 
         caption: string
         description: string
         created: timestamp
-        statement_descriptor: string
+        statementDescriptor: string
         type: string
-        unit_label: string
+        unitLabel: string
         url: string
         metadata: hash
         quotas: list
@@ -86,9 +86,9 @@ An example Product:
         "caption": "Small institutions or groups",
         "description": "Create multiple portals for your work and projects. Help others understand and access your data.",
         "created": 1559768309,
-        "statement_descriptor": "DataONE Membership Plan - Organization",
+        "statementDescriptor": "DataONE Membership Plan - Organization",
         "type": "service",
-        "unit_label": "membership",
+        "unitLabel": "membership",
         "url": "https://dataone.org/memberships/organization",
         "metadata": {
             "features": [
@@ -99,8 +99,8 @@ An example Product:
                     "quota": {
                         "object": "quota"
                         "name": "custom_portal_count"
-                        "soft_limit": "3"
-                        "hard_limit": "3"
+                        "softLimit": "3"
+                        "hardLimit": "3"
                         "unit": "portal"
                     }
                 },
@@ -136,7 +136,7 @@ An example Product:
 Customers
 ---------
 
-Customers are associated with a DataONE account (by ORCID), and are associated with Orders, Invoices, Charges, and Quotas based on certain purchased Products.
+Customers are associated with a DataONE account (by ORCID), and are associated with Orders, Invoices, Charges, and Quotas based on certain free or purchased Products.
  
 ..
     @startuml images/customer.png
@@ -153,13 +153,13 @@ Customers are associated with a DataONE account (by ORCID), and are associated w
         description: string
         discount: hash
         email: string
-        invoice_prefix: string
-        invoice_settings: hash
+        invoicePrefix: string
+        invoiceSettings: hash
         metadata: hashes
         name: string
         phone: string
         subscriptions: list
-        tax_exempt: string
+        taxExempt: string
     }
     @enduml
 
@@ -168,7 +168,13 @@ Customers are associated with a DataONE account (by ORCID), and are associated w
 Quotas
 ------
 
-Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. Quotas have a soft and hard limit per unit to help with communicating limit warnings.
+Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. Quotas have a soft and hard limit per unit to help with communicating limit warnings.  Quotas that are not associated with a ``Subject`` are considered general product quotas used for informational display (part of a Product's Feature list).
+
+Quotas kept for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.  
+
+.. note::
+    
+    The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
 ..
     @startuml images/quota.png
@@ -178,13 +184,37 @@ Quotas are limits set for a particular product, such as the number of portals al
         id: string
         object: string
         name: string
-        soft_limit: integer
-        hard_limit: integer
+        softLimit: integer
+        hardLimit: integer
+        usage: integer
         unit: string
+        customerId: integer,
+        subject: string
     }
     @enduml
 
 .. image:: images/quota.png
+
+.. note::
+    Quota limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
+    
+Authorizing resource usage
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+Authorization of resource usage across Member Nodes involves a call to the quota service to determine the soft limit, hard limit, and usage, and throwing an InsufficentResources exception when the usage is at or over the hard limit.  For storage quotas, hard limits might be set to 10% greater than the soft limit, whereas for portal limits, the soft and hard limits might be equal.  These settings can be individually customized as well. Client applications may also check quota limits for a given ``Subject`` before attempting to call an ``MNStorage`` API method (i.e. ``create()`` or ``update``).
+    
+Managing Shared Quotas
+~~~~~~~~~~~~~~~~~~~~~~
+
+Quotas are established when a Customer enrolls for free or paid services.  Customers are associated with their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against their this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.rightsHolder`` field is used to check for quota limits.  In the case of an individual researcher, the client application should set the rightsHolder to the individual's ``Subject`` identifier.
+
+In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
+client applications should set the ``rightsHolder`` field for each object to the DataONE group identifier associated with the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  The "owner" of the object (i.e. the ``rightsHolder``) is then used to determine quota usage across the DataONE network.
+
+.. note::
+    Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
+
+DataONE 
 
 Orders
 ------
@@ -199,7 +229,7 @@ Orders track Customer purchases of a list of Products, and the total amount of t
         id: string
         object: string
         amount: integer
-        amount_returned: integer
+        amountReturned: integer
         charge: string
         created: timestamp
         currency: string
@@ -208,7 +238,7 @@ Orders track Customer purchases of a list of Products, and the total amount of t
         items: array of hashes
         metadata: hash
         status: string
-        status_transitions: hash
+        statusTransitions: hash
         updated: timestamp
     }
     @enduml
@@ -228,18 +258,18 @@ Charges document transactions against a given payment source, like a credit card
         id: string
         object: string
         amount: integer
-        amount_refunded: integer
+        amountRefunded: integer
         created: timestamp
         currency: string
         customer: string
         description: string
-        failure_code: string
+        failureCode: string
         invoice: string
         metadata: hash
         order: string
         outcome: string
         paid: boolean
-        receipt_email: string
+        receiptEmail: string
         refunded: boolean
         refunds: list
         status: string
