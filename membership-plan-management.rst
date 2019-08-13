@@ -10,9 +10,9 @@ Overview
 To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Orders``, ``Invoices``, ``Charges``, and ``Quotas`` that DataONE needs to track. This documents:
 
 - What service ``Products`` are available for purchase
-- What Products a ``Customer`` purchased in an ``Order``
-- What Invoices have been sent for an Order
-- Which payment ``Charge``(s) completed the ``Order``
+- What ``Products`` a ``Customer`` purchased in an ``Order``
+- What ``Invoices`` have been sent for an ``Order``
+- Which payment ``Charge`` completed the ``Order``
 - What ``Quota`` limits are set for ``Customers`` per ``Product``.
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
