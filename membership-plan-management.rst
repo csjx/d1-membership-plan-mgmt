@@ -7,15 +7,13 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships. This document outlines the design and implementation details needed to offer these services. It describes the Products, Customers, Orders, Invoices, Charges, and Quotas that DataONE needs to track. This documents:
+To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the Products, Customers, Orders, Invoices, Charges, and Quotas that DataONE needs to track. This documents:
 
 - What service Products are available for purchase
 - What Products a Customer purchased in an Order
 - What Invoices have been sent for an Order
 - Which payment Charge(s) completed the Order
 - What Quota limits are set for Customers per Product.
-
-Details of how the payment will be collected is to be determined, but will involve the UCSB Aventri events service. Personally identifiable information that is stored will be limited to names, emails, and billing addresses, and will exclude financial transaction details (credit cards, etc.) other than the outcome of a Charge transaction.
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
@@ -137,7 +135,7 @@ An example Product:
 Customers
 ---------
 
-Customers are associated with a DataONE account (by ORCID), and are associated with Orders, Invoices, Charges, and Quotas based on certain free or purchased Products.
+Customers are associated with a DataONE account (by ORCID identifier), and are associated with Orders, Invoices, Charges, and Quotas based on certain free or purchased Products.
  
 ..
     @startuml images/customer.png
@@ -389,3 +387,12 @@ An example Charge:
         "status": "succeeded"
     }
 
+Payments
+--------
+
+Details of how payments will be collected is to be determined, but will involve the UCSB Aventri events service. This service provides an API to create ``"Events"`` and ``"Attendees"`` which will be translated to ``"Products"`` and ``"Customers"``.  The API allows for REST-based callbacks, so when a user pays for an ``"Event"``, a registered callback will be called to inform the DataONE system of the purchase.  The DataONE system can then make a secondary call to get the details on the ``Attendee's`` payment.
+
+    Note: While the Aventri system is not a one-to-one match for managing product payments, it looks to be flexible enough to map concepts, but needs further discussion.
+
+
+Personally identifiable information that is stored in the DataONE system will be limited to, for instance, names, emails, and billing addresses, and will exclude financial transaction details (credit cards, etc.) other than the outcome of a Charge transaction.
