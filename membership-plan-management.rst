@@ -172,9 +172,7 @@ Quotas are limits set for a particular product, such as the number of portals al
 
 Quotas kept for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.  
 
-.. note::
-    
-    The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
+    Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
 ..
     @startuml images/quota.png
@@ -193,11 +191,10 @@ Quotas kept for individual ``Subject`` identifiers also include a ``usage`` fiel
     }
     @enduml
 
+    Note: Quota limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
+
 .. image:: images/quota.png
 
-.. note::
-    Quota limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
-    
 Authorizing resource usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -211,8 +208,7 @@ Quotas are established when a Customer enrolls for free or paid services.  Custo
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
 client applications should set the ``rightsHolder`` field for each object to the DataONE group identifier associated with the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  The "owner" of the object (i.e. the ``rightsHolder``) is then used to determine quota usage across the DataONE network.
 
-.. note::
-    Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
+    Note: Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
 
 Orders
 ------
