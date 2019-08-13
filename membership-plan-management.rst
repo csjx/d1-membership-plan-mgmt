@@ -214,8 +214,6 @@ client applications should set the ``rightsHolder`` field for each object to the
 .. note::
     Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
 
-DataONE 
-
 Orders
 ------
 
