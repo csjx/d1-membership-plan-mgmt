@@ -97,10 +97,11 @@ An example Product:
                     "label": "Branded Portals",
                     "description": "Showcase your research, data, results, and usage metrics by building a custom web portal.",
                     "quota": {
-                        "object": "quota"
-                        "name": "custom_portal_count"
-                        "softLimit": "3"
-                        "hardLimit": "3"
+                        "id": 5,
+                        "object": "quota",
+                        "name": "custom_portal_count",
+                        "softLimit": "3",
+                        "hardLimit": "3",
                         "unit": "portal"
                     }
                 },
