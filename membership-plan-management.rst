@@ -165,6 +165,37 @@ Customers are associated with a DataONE account (by ORCID), and are associated w
 
 .. image:: images/customer.png
 
+An example Customer:
+
+.. code::
+    
+    {
+        "id": 1,
+        "object": "customer",
+        "subject": "http://orcid.org/0000-0002-8121-2341",
+        "balance": 0,
+        "address": {
+            "line1": "735 State Street",
+            "line2": "Suite 300",
+            "city": "Santa Barbara",
+            "state": "CA",
+            "postalCode": "93106",
+            "country": "USA"
+        },
+        "created": 1562866734,
+        "currency": "USD",
+        "delinquent": false,
+        "description": "",
+        "discount": {},
+        "email": "cjones@nceas.ucsb.edu",
+        "invoicePrefix": "",
+        "invoiceSettings": {},
+        "metadata": {},
+        "givenName": "Christopher",
+        "surName": "Jones",
+        "phone": "805-893-2500"
+    }
+    
 Quotas
 ------
 
@@ -186,7 +217,7 @@ Quotas kept for individual ``Subject`` identifiers also include a ``usage`` fiel
         hardLimit: integer
         usage: integer
         unit: string
-        customerId: integer,
+        customerId: integer
         subject: string
     }
     @enduml
@@ -209,6 +240,21 @@ In the case of shared quotas where a resource (like storage) is to be applied to
 client applications should set the ``rightsHolder`` field for each object to the DataONE group identifier associated with the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  The "owner" of the object (i.e. the ``rightsHolder``) is then used to determine quota usage across the DataONE network.
 
     Note: Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
+
+An example 4TB Quota with a 90% soft limit:
+
+.. code::
+    
+    {
+        "id": 1,
+        "object":"quota",
+        "name":"archive_storage",
+        "softLimit": 3774873,
+        "hardLimit": 4194304,
+        "unit": "megabyte"
+        "customerId": 2,
+        "subject": "CN=budden-lab,DC=dataone,DC=org"
+    }
 
 Orders
 ------
@@ -238,6 +284,55 @@ Orders track Customer purchases of a list of Products, and the total amount of t
     @enduml
 
 .. image:: images/order.png
+
+An example Order:
+
+.. code::
+    
+    {
+        "id": 1,
+        "object": "order",
+        "amount": 50000,
+        "amountReturned": 0,
+        "charge": {
+            "id": 3,
+            "object": "charge",
+            "amount": 50000,
+            "amountRefunded": 0,
+            "created": 1559768309,
+            "currency": "USD",
+            "customer": 2,
+            "description": "DataONE Order # 1",
+            "invoice": 4,
+            "metadata": {},
+            "order": 1,
+            "paid": true,
+            "statementDescriptor": "DataONE Order # 1",
+            "status": "succeeded"
+        },
+        "created": 1559768309,
+        "currency": "USD",
+        "customer": 2,
+        "email": "cjones@nceas.ucsb.edu",
+        "items": [
+            {
+            "object": "order_item",
+            "amount": 50000,
+            "currency": "USD",
+            "description": "DataONE Individual Membership",
+            "parent": 1000,
+            "quantity": 1,
+            "type": "sku"
+            }
+        ],
+        "metadata": {},
+        "status": "paid",
+        "statusTransitions": {
+            "created": 1559768309,
+            "paid": 1559768309
+        },
+        "updated": 1559768309
+    }
 
 Charges
 -------
@@ -271,4 +366,25 @@ Charges document transactions against a given payment source, like a credit card
     @enduml
 
 .. image:: images/charge.png
+
+An example Charge:
+
+.. code::
+    
+    {
+        "id": 3,
+        "object": "charge",
+        "amount": 50000,
+        "amountRefunded": 0,
+        "created": 1559768309,
+        "currency": "USD",
+        "customer": 2,
+        "description": "DataONE Order # 1",
+        "invoice": 4,
+        "metadata": {},
+        "order": 1,
+        "paid": true,
+        "statementDescriptor": "DataONE Order # 1",
+        "status": "succeeded"
+    }
 
