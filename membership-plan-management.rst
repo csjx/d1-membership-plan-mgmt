@@ -49,6 +49,18 @@ Products
 
 Products define the exact DataONE service offered, and describe the features of the service using the extensible ``metadata`` field.  Each Product is unique and may be part of any Order, such as training or consultation Products.  DataONE keeps a catalog of Products offered over time which may be listed by client applications.
 
+Product REST endpoints:
+
+.. code::
+    
+    listProducts():  GET    /products
+    createProduct(): POST   /products
+    getProduct():    GET    /products/:id
+    getProduct():    GET    /products?name=:name
+    getProduct():    GET    /products?description=:description
+    updateProduct(): PUT    /products/:id
+    deleteProduct(): DELETE /products/:id
+
 ..
     @startuml images/product.png
     !include ./plantuml-styles.txt
@@ -137,6 +149,18 @@ Customers
 
 Customers are associated with a DataONE account (by ORCID identifier), and are associated with Orders, Invoices, Charges, and Quotas based on certain free or purchased Products.
  
+Customer REST endpoints:
+
+.. code::
+    
+    listCustomers():  GET    /customers
+    createCustomer(): POST   /customers
+    getCustomer():    GET    /customers/:id
+    getCustomer():    GET    /customers?subject=:subject
+    getCustomer():    GET    /customers?email=:email
+    updateCustomer(): PUT    /customers/:id
+    deleteCustomer(): DELETE /customers/:id
+
 ..
     @startuml images/customer.png
     !include ./plantuml-styles.txt
@@ -204,6 +228,18 @@ Quotas kept for individual ``Subject`` identifiers also include a ``usage`` fiel
 
     Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
+Quota REST endpoints:
+
+.. code::
+    
+    listQuotas():  GET    /quotas
+    listQuotas():  GET    /quotas?customerId=:customerId
+    listQuotas():  GET    /quotas?subject=:subject
+    createQuota(): POST   /quotas
+    getQuota():    GET    /quotas/:id
+    updateQuota(): PUT    /quotas/:id
+    deleteQuota(): DELETE /quotas/:id
+
 ..
     @startuml images/quota.png
     !include ./plantuml-styles.txt
@@ -228,7 +264,7 @@ Quotas kept for individual ``Subject`` identifiers also include a ``usage`` fiel
 Authorizing resource usage
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-Authorization of resource usage across Member Nodes involves a call to the quota service to determine the soft limit, hard limit, and usage, and throwing an InsufficentResources exception when the usage is at or over the hard limit.  For storage quotas, hard limits might be set to 10% greater than the soft limit, whereas for portal limits, the soft and hard limits might be equal.  These settings can be individually customized as well. Client applications may also check quota limits for a given ``Subject`` before attempting to call an ``MNStorage`` API method (i.e. ``create()`` or ``update``).
+Authorization of resource usage across Member Nodes involves a call to the quota service to determine the soft limit, hard limit, and usage, and throwing an ``InsufficentResources`` exception when the usage is at or over the hard limit.  For storage quotas, hard limits might be set to 10% greater than the soft limit, whereas for portal limits, the soft and hard limits might be equal.  These settings can be individually customized as well. Client applications may also check quota limits for a given ``Subject`` before attempting to call an ``MNStorage`` API method (i.e. ``create()`` or ``update``).
     
 Managing Shared Quotas
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -259,6 +295,18 @@ Orders
 ------
 
 Orders track Customer purchases of a list of Products, and the total amount of the Order that was charged in a Charge.
+
+Order REST endpoints:
+
+.. code::
+    
+    listOrders():  GET    /orders
+    createOrder(): POST   /orders
+    getOrder():    GET    /orders/:id
+    getOrder():    GET    /orders?subject=:subject
+    getOrder():    GET    /orders?customerId=:customerId
+    updateOrder(): PUT    /orders/:id
+    deleteOrder(): DELETE /orders/:id
 
 ..
     @startuml images/order.png
