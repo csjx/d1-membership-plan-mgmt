@@ -7,13 +7,13 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the Products, Customers, Orders, Invoices, Charges, and Quotas that DataONE needs to track. This documents:
+To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Orders``, ``Invoices``, ``Charges``, and ``Quotas`` that DataONE needs to track. This documents:
 
-- What service Products are available for purchase
-- What Products a Customer purchased in an Order
+- What service ``Products`` are available for purchase
+- What Products a ``Customer`` purchased in an ``Order``
 - What Invoices have been sent for an Order
-- Which payment Charge(s) completed the Order
-- What Quota limits are set for Customers per Product.
+- Which payment ``Charge``(s) completed the ``Order``
+- What ``Quota`` limits are set for ``Customers`` per ``Product``.
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
@@ -47,7 +47,7 @@ The following diagram shows the membership and payment records stored by DataONE
 Products
 --------
 
-Products define the exact DataONE service offered, and describe the features of the service using the extensible ``metadata`` field.  Each Product is unique and may be part of any Order, such as training or consultation Products.  DataONE keeps a catalog of Products offered over time which may be listed by client applications.
+``Products`` define the exact DataONE service offered, and describe the features of the service using the extensible ``metadata`` field.  Each ``Product`` is unique and may be part of any ``Order``, such as training or consultation ``Products``.  DataONE keeps a catalog of ``Products`` offered over time which may be listed by client applications.
 
 Product REST endpoints:
 
@@ -84,7 +84,7 @@ Product REST endpoints:
 
 .. image:: images/product.png
 
-An example Product:
+An example ``Product``:
 
 .. code:: json
 
@@ -147,7 +147,7 @@ An example Product:
 Customers
 ---------
 
-Customers are associated with a DataONE account (by ORCID identifier), and are associated with Orders, Invoices, Charges, and Quotas based on certain free or purchased Products.
+``Customers`` are associated with a DataONE account (by ORCID identifier), and are associated with ``Orders``, ``Invoices``, ``Charges``, and ``Quotas`` based on certain free or purchased ``Products``.
  
 Customer REST endpoints:
 
@@ -188,7 +188,7 @@ Customer REST endpoints:
 
 .. image:: images/customer.png
 
-An example Customer:
+An example ``Customer``:
 
 .. code::
     
@@ -222,9 +222,9 @@ An example Customer:
 Quotas
 ------
 
-Quotas are limits set for a particular product, such as the number of portals allowed, disk space allowed, etc. Quotas have a soft and hard limit per unit to help with communicating limit warnings.  Quotas that are not associated with a ``Subject`` are considered general product quotas used for informational display (part of a Product's Feature list).
+``Quotas`` are limits set for a particular ``Product``, such as the number of portals allowed, disk space allowed, etc. ``Quotas`` have a soft and hard limit per unit to help with communicating limit warnings.  ``Quotas`` that are not associated with a ``Subject`` are considered general product quotas used for informational display (part of a Product's ``Feature`` list).
 
-Quotas kept for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.  
+``Quotas`` kept for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.  
 
     Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
@@ -257,7 +257,7 @@ Quota REST endpoints:
     }
     @enduml
 
-    Note: Quota limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
+    Note: ``Quota`` limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
 
 .. image:: images/quota.png
 
@@ -269,14 +269,14 @@ Authorization of resource usage across Member Nodes involves a call to the quota
 Managing Shared Quotas
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Quotas are established when a Customer enrolls for free or paid services.  Customers are associated with their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against their this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.rightsHolder`` field is used to check for quota limits.  In the case of an individual researcher, the client application should set the rightsHolder to the individual's ``Subject`` identifier.
+``Quotas`` are established when a ``Customer`` enrolls for free or paid services.  ``Customers`` are associated with their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.rightsHolder`` field is used to check for quota limits.  In the case of an individual researcher, the client application should set the rightsHolder to the individual's ``Subject`` identifier.
 
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
 client applications should set the ``rightsHolder`` field for each object to the DataONE group identifier associated with the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  The "owner" of the object (i.e. the ``rightsHolder``) is then used to determine quota usage across the DataONE network.
 
     Note: Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
 
-An example 4TB Quota with a 90% soft limit:
+An example 4TB ``Quota`` with a 90% soft limit:
 
 .. code::
     
@@ -294,7 +294,7 @@ An example 4TB Quota with a 90% soft limit:
 Orders
 ------
 
-Orders track Customer purchases of a list of Products, and the total amount of the Order that was charged in a Charge.
+``Orders`` track ``Customer`` purchases of a list of ``Products``, and the total amount of the ``Order`` that was charged in a ``Charge``.
 
 Order REST endpoints:
 
@@ -384,7 +384,7 @@ An example Order:
 Charges
 -------
 
-Charges document transactions against a given payment source, like a credit card.  While DataONE won't track payment sources, we will track Charge events by ID as part of an Order.
+``Charges`` document transactions against a given payment source, like a credit card.  While DataONE won't track payment sources, we will track ``Charge`` events by ID as part of an ``Order``.
 
 ..
     @startuml images/charge.png
@@ -438,9 +438,9 @@ An example Charge:
 Payments
 --------
 
-Details of how payments will be collected is to be determined, but will involve the UCSB Aventri events service. This service provides an API to create ``"Events"`` and ``"Attendees"`` which will be translated to ``"Products"`` and ``"Customers"``.  The API allows for REST-based callbacks, so when a user pays for an ``"Event"``, a registered callback will be called to inform the DataONE system of the purchase.  The DataONE system can then make a secondary call to get the details on the ``Attendee's`` payment.
+Details of how payments will be collected is to be determined, but will involve the UCSB Aventri events service. This service provides an API to create ``Events`` and ``Attendees`` which will be translated to ``Products`` and ``Customers``.  The API allows for REST-based callbacks, so when a user pays for an ``Event``, a registered callback will be called to inform the DataONE system of the purchase.  The DataONE system can then make a secondary call to get the details on the ``Attendee's`` payment.
 
     Note: While the Aventri system is not a one-to-one match for managing product payments, it looks to be flexible enough to map concepts, but needs further discussion.
 
 
-Personally identifiable information that is stored in the DataONE system will be limited to, for instance, names, emails, and billing addresses, and will exclude financial transaction details (credit cards, etc.) other than the outcome of a Charge transaction.
+Personally identifiable information that is stored in the DataONE system will be limited to, for instance, names, emails, and billing addresses, and will exclude financial transaction details (credit cards, etc.) other than the outcome of a ``Charge`` transaction.
