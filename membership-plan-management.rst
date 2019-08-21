@@ -24,6 +24,8 @@ The following diagram shows the membership and payment records stored by DataONE
     }
     class Customer {
     }
+    class Usage {
+    }
     class Order {
     }
     class Invoice {
@@ -37,9 +39,9 @@ The following diagram shows the membership and payment records stored by DataONE
     Order "0" -right-o "n" Product : "associated with"
     Order "0" -up-o "n" Charge : "   associated with"
     Order "1" -left-o "n" Invoice : "   associated with"
-    Customer "0"-right-o "n" Quota : "   associated with"
-    Product "0"-down-o "n" Quota : "   associated with"
-    
+    Product "0" -up-o "n" Quota : "   associated with"
+    Customer "0" -right-o "n" Usage : "associated with       "
+    Product "n" -down-o "0" Usage : "associated with"
     @enduml
     
 .. image:: images/overview.png
