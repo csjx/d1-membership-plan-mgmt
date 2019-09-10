@@ -7,13 +7,14 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Orders``, ``Invoices``, ``Charges``, and ``Quotas`` that DataONE needs to track. This documents:
+To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Subscriptions``, ``Quotas``, ``Orders``, ``Invoices``, and ``Charges`` and that DataONE needs to track. This documents:
 
 - What service ``Products`` are available for purchase
 - What ``Products`` a ``Customer`` purchased in an ``Order``
+- What ``Subscriptions`` are established for a ``Customer`` for a ``Product``
+- What ``Quota`` limits are set for ``Customers`` per ``Subscription``.
 - What ``Invoices`` have been sent for an ``Order``
-- Which payment ``Charge`` completed the ``Order``
-- What ``Quota`` limits are set for ``Customers`` per ``Product``.
+- Which payment ``Charges`` completed the ``Order``
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
@@ -22,9 +23,11 @@ The following diagram shows the membership and payment records stored by DataONE
     !include ./plantuml-styles.txt
     class Product {
     }
+    class Feature {
+    }
     class Customer {
     }
-    class Usage {
+    class Subscription {
     }
     class Order {
     }
@@ -35,13 +38,15 @@ The following diagram shows the membership and payment records stored by DataONE
     class Quota {
     }
     
-    Customer "1" --o "n" Order : "   associated with"
-    Order "0" -right-o "n" Product : "associated with"
-    Order "0" -up-o "n" Charge : "   associated with"
-    Order "1" -left-o "n" Invoice : "   associated with"
-    Product "0" -up-o "n" Quota : "   associated with"
-    Customer "0" -right-o "n" Usage : "associated with       "
-    Product "n" -down-o "0" Usage : "associated with"
+    Customer "1" --o "n" Order : "          "
+    Order "0" -right-o "n" Product : "          "
+    Order "0" -up-o "n" Charge : "          "
+    Order "0" -left-o "n" Invoice : "          "
+    Customer "0" -right-o "n" Subscription : "          "
+    Subscription "1" -up-o "n" Product : "          "
+    Subscription "1" -right-o "n" Quota : "          "
+    Product "0" -right-o "n" Feature : "          "
+    Feature "0" -down-o "1" Quota : "          "
     @enduml
     
 .. image:: images/overview.png
@@ -80,7 +85,6 @@ Product REST endpoints:
         unitLabel: string
         url: string
         metadata: hash
-        quotas: list
     }
     @enduml
 
@@ -105,13 +109,13 @@ An example ``Product``:
         "metadata": {
             "features": [
                 {
-                    "name": "custom_portal",
+                    "name": "branded_portal",
                     "label": "Branded Portals",
                     "description": "Showcase your research, data, results, and usage metrics by building a custom web portal.",
                     "quota": {
                         "id": 5,
                         "object": "quota",
-                        "name": "custom_portal_count",
+                        "name": "branded_portal_count",
                         "softLimit": "3",
                         "hardLimit": "3",
                         "unit": "portal"
@@ -149,7 +153,7 @@ An example ``Product``:
 Customers
 ---------
 
-``Customers`` are associated with a DataONE account (by ORCID identifier), and are associated with ``Orders``, ``Invoices``, ``Charges``, and ``Quotas`` based on certain free or purchased ``Products``.
+``Customers`` are identified by a DataONE account (by ORCID identifier), and are associated with ``Orders`` that they make for free or purchased ``Products``.  When an ``Order`` is completed, the ``Customer`` is associated with a ``Subscription`` which links the ordered ``Product`` to the ``Customer`` and the associated ``Quota`` limits.
  
 Customer REST endpoints:
 
@@ -192,7 +196,7 @@ Customer REST endpoints:
 
 An example ``Customer``:
 
-.. code::
+.. code:: json
     
     {
         "id": 1,
@@ -221,21 +225,99 @@ An example ``Customer``:
         "phone": "805-893-2500"
     }
     
+Subscriptions
+-------------
+
+``Subscriptions`` represent a ``Product`` that has been ordered by a ``Customer`` and is paid for on a recurring basis.  A ``Subscription`` records the creation and cancelation dates, and can  an optional ``Discount``.  They may also be the ``Quota`` defined in the subscribed  ``Product``, along with the ``Usage`` of the limited resource. 
+
+Subscription REST endoints:
+
+.. code::
+    
+    listSubscriptions():  GET    /subscriptions
+    listSubscriptions():  GET    /subscriptions?customerId=:customerId
+    listSubscriptions():  GET    /subscriptions?subject=:subject
+    createSubscription(): POST   /subscriptions
+    getSubscription():    GET    /subscriptions/:id
+    updateSubscription(): PUT    /subscriptions/:id
+    cancelSubscription(): DELETE /subscriptions/:id
+
+..
+    @startuml images/subscription.png
+    !include ./plantuml-styles.txt
+
+    class Subscription {
+        id: string
+        object: string
+        billingCycleAnchor: timestamp
+        canceledAt: timestamp
+        collectionMethod: string
+        created: timestamp
+        currentPeriodEnd: timestamp
+        currentPeriodStart: timestamp
+        customer: integer
+        daysUntilDue: integer
+        discount: hash
+        endedAt: timestamp
+        items: list
+        latestInvoice: integer
+        metadata: hash
+        product: integer
+        quantity: integer
+        start: timestamp
+        startDate: timestamp
+        status: string
+        trialEnd: timestamp
+        trialStart: timestamp
+    }
+    @enduml
+
+.. image:: images/subscription.png
+
+An example ``Subscription``:
+
+.. code:: json
+    
+    {
+        "id": 10,
+        "object": "subscription",
+        "billingCycleAnchor": 1568066038,
+        "canceledAt": null,
+        "collectionMethod": "send_invoice",
+        "created": 1568066038,
+        "currentPeriodEnd": 1599602038,
+        "currentPeriodStart": 1568066038,
+        "customer": 20,
+        "daysUntilDue": 365,
+        "discount": null,
+        "endedAt": null,
+        "latestInvoice": 30,
+        "metadata": {},
+        "product": 2,
+        "quantity": 1,
+        "startDate": 1568066038,
+        "status": "unpaid",
+        "trialEnd": null,
+        "trialStart": null
+    }
+
 Quotas
 ------
 
-``Quotas`` are limits set for a particular ``Product``, such as the number of portals allowed, disk space allowed, etc. ``Quotas`` have a soft and hard limit per unit to help with communicating limit warnings.  ``Quotas`` that are not associated with a ``Subject`` are considered general product quotas used for informational display (part of a Product's ``Feature`` list).
+``Quotas`` are limits set for a particular ``Product``, such as the number of portals allowed, disk space allowed, etc. ``Quotas`` have a soft and hard limit per unit to help with communicating limit warnings.  ``Quotas`` that don't have an associated ``Subject`` are considered general product quotas used for informational display (part of a Product's ``Feature`` list).
 
-``Quotas`` kept for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.  
+``Quotas`` stored for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.
 
     Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
+
+``Quotas`` are established through ``Subscriptions``, where a ``Customer`` subscribes to ``Products``. Multiple ``Quotas`` can be associated with a given ``Subscription``.
 
 Quota REST endpoints:
 
 .. code::
     
     listQuotas():  GET    /quotas
-    listQuotas():  GET    /quotas?customerId=:customerId
+    listQuotas():  GET    /quotas?subscriptionId=:subscriptionId
     listQuotas():  GET    /quotas?subject=:subject
     createQuota(): POST   /quotas
     getQuota():    GET    /quotas/:id
@@ -254,7 +336,7 @@ Quota REST endpoints:
         hardLimit: integer
         usage: integer
         unit: string
-        customerId: integer
+        subscriptionId: integer
         subject: string
     }
     @enduml
@@ -271,16 +353,22 @@ Authorization of resource usage across Member Nodes involves a call to the quota
 Managing Shared Quotas
 ~~~~~~~~~~~~~~~~~~~~~~
 
-``Quotas`` are established when a ``Customer`` enrolls for free or paid services.  ``Customers`` are associated with their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.rightsHolder`` field is used to check for quota limits.  In the case of an individual researcher, the client application should set the rightsHolder to the individual's ``Subject`` identifier.
+``Quotas`` are established when a ``Customer`` enrolls for free or paid services.  ``Customers`` are their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.submitter`` field is used to check for quota limits.
 
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
-client applications should set the ``rightsHolder`` field for each object to the DataONE group identifier associated with the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  The "owner" of the object (i.e. the ``rightsHolder``) is then used to determine quota usage across the DataONE network.
+client applications should set the appropriate `HTTP extension header field`_ during a call to the ``MNStorage`` methods of ``create()`` and ``update``. The DataONE custom HTTP extension headers include:
 
-    Note: Using the ``SystemMetadata.rightsHolder`` field is a simple way to definitively manage quotas for both users and groups, but also has implications on authorization.  This needs discussion.
+- ``X-DataONE-Storage-Subject``: The ``Subject`` used to determine shared archive storage quotas.
+- ``X-DataONE-Portal-Subject``: The ``Subject`` used to determine shared branded portal quotas.
+- ``X-DataONE-Replication-Subject``: The ``Subject`` used to determine shared replication quotas.
+
+The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Storage-Subject`` unless applying the storage to  the ``submitter`` ``Subject's`` quota is desired.  When uploading portal documents (i.e. with an ``https://purl.dataone.org/portals-1.0.0`` format identifier), the ``X-DataONE-Portal-Subject`` should also be included.
+
+.. _`HTTP extension header field`: https://tools.ietf.org/html/rfc2616#section-4.2
 
 An example 4TB ``Quota`` with a 90% soft limit:
 
-.. code::
+.. code:: json
     
     {
         "id": 1,
@@ -336,7 +424,7 @@ Order REST endpoints:
 
 An example Order:
 
-.. code::
+.. code:: json
     
     {
         "id": 1,
@@ -418,7 +506,7 @@ Charges
 
 An example Charge:
 
-.. code::
+.. code:: json
     
     {
         "id": 3,
