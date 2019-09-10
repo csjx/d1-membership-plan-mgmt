@@ -376,7 +376,7 @@ An example 4TB ``Quota`` with a 90% soft limit:
         "name":"archive_storage",
         "softLimit": 3774873,
         "hardLimit": 4194304,
-        "unit": "megabyte"
+        "unit": "megabyte",
         "customerId": 2,
         "subject": "CN=budden-lab,DC=dataone,DC=org"
     }
