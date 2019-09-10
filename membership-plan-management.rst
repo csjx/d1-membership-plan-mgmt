@@ -384,7 +384,7 @@ An example 4TB ``Quota`` with a 90% soft limit:
 Orders
 ------
 
-``Orders`` track ``Customer`` purchases of a list of ``Products``, and the total amount of the ``Order`` that was charged in a ``Charge``.
+``Orders`` track ``Customer`` purchases of a list of ``Products``, and the total amount of the ``Order`` that was charged in a ``Charge``.  Orders may be associated with an ``Invoice`` reminder for payment.  
 
 Order REST endpoints:
 
@@ -396,6 +396,7 @@ Order REST endpoints:
     getOrder():    GET    /orders?subject=:subject
     getOrder():    GET    /orders?customerId=:customerId
     updateOrder(): PUT    /orders/:id
+    payOrder():    PUT    /orders/:id/pay
     deleteOrder(): DELETE /orders/:id
 
 ..
@@ -471,6 +472,207 @@ An example Order:
         "updated": 1559768309
     }
 
+Creating an Order
+~~~~~~~~~~~~~~~~~
+
+The following sequence diagram outlines the steps needed for a client to create an order:
+
+..
+    @startuml images/create-order.png
+    !include ./plantuml-styles.txt
+    
+    title "Small Organization Membership with two hours Consultation"
+    actor Researcher
+    participant Client
+    participant Bookkeeper <<Service>>
+    participant "CN" <<Service>>
+    participant Aventri <<Service>>
+    
+    activate Researcher
+    Researcher -> Client : opens pricing page
+    deactivate Researcher
+    
+    activate Client
+        Client -> Bookkeeper : listProducts()
+    deactivate Client
+    
+    activate Bookkeeper
+        Bookkeeper --> Client : products []
+    deactivate Bookkeeper
+    
+    activate Client
+        Client -> Client : showPricingView()
+        Client --> Researcher : pricing view
+    deactivate Client
+
+    activate Researcher
+        Researcher -> Client : chooses "Small Organization Membership"
+    deactivate Researcher
+    
+    activate Client
+        Client -> Client : isLoggedIn()
+        Client -> CN : authenticate()
+    deactivate Client
+    
+    activate CN
+        note right
+            CN uses orcid.org 
+            for authentication
+        end note
+        CN --> Client : token
+    deactivate CN
+    
+    activate Client
+        Client -> Client : smallMember = new Product()
+        Client -> Client : order = new Order()
+        Client -> Client : order.add(smallMember)
+        note right
+            Add the Small Organization 
+            Membership to the order
+        end note
+        Client -> Bookkeeper : createOrder(order)
+    deactivate Client
+
+    activate Bookkeeper
+        Bookkeeper -> Bookkeeper : createCustomer()
+        Bookkeeper --> Client : order
+    deactivate Bookkeeper
+
+    activate Client
+        Client -> Client : showMembershipOptions()
+        note right
+            Options are offered to some
+            memberships, not others.
+            Filter the product list 
+            based on product category
+            for the chosen membership.
+        end note
+        Client -> Researcher : membership options view
+    deactivate Client
+    
+    activate Researcher
+        Researcher -> Client : chooses 2 x Consultation/hr
+    deactivate Researcher
+    
+    activate Client
+        Client -> Client : consult = new Product()
+        Client -> Client : order.add(consult)
+        Client -> Bookkeeper : updateOrder(order)
+    deactivate Client
+    
+    activate Bookkeeper
+        Bookkeeper --> Client : order
+    deactivate Bookkeeper
+
+    activate Researcher
+        Researcher -> Client : chooses "Continue"
+    deactivate Researcher
+
+    activate Client
+        Client -> Client : showOrderSummary()
+        Client --> Researcher : order summary view
+    deactivate Client
+    
+    activate Researcher
+        Researcher -> Client : chooses "Confirm Order"
+    deactivate Researcher
+
+    activate Client
+        Client -> Bookkeeper : payOrder(order)
+    deactivate Client
+    
+    activate Bookkeeper
+        Bookkeeper -> Bookkeeper : attendee = new Attendee(order)
+        Bookkeeper -> Aventri : createAttendee(attendee, event)
+        note right
+            The Aventri event id that
+            corresponds to our Small
+            Organization Membership
+            will be embedded in the 
+            Product metadata
+        end note
+    deactivate Bookkeeper
+    
+    activate Aventri
+        Aventri --> Bookkeeper : attendeeId
+    deactivate Aventri
+    
+    activate Bookkeeper
+        Bookkeeper -> Aventri : createAttendeeBridge(attendee, event)
+    deactivate Bookkeeper
+    
+    activate Aventri
+        Aventri --> Bookkeeper : attendeeBridgeId
+    deactivate Aventri
+
+    activate Bookkeeper
+        Bookkeeper -> Bookkeeper : createPaymentURL()
+        Bookkeeper --> Client : paymentURL
+    deactivate Bookkeeper
+    
+    activate Client
+        Client -> Client : showPaymentButton(paymentURL)
+        Client --> Researcher : payment button
+    deactivate Client
+    
+    activate Researcher
+        Researcher -> Aventri : opens payment URL
+    deactivate Researcher
+    
+    activate Aventri
+        Aventri --> Researcher : payment page
+    deactivate Aventri
+
+    activate Researcher
+        Researcher -> Aventri : pays order
+    deactivate Researcher
+
+    activate Aventri
+        Aventri -> Bookkeeper : eventUpdated(eventId, attendeeId)
+        note left
+            This call sequence is asynchronous,
+            so the researcher sees success
+            immediately
+        end note
+    deactivate Aventri
+
+    activate Bookkeeper
+        Bookkeeper -> Aventri : getAttendeeInfo(attendeeId)
+    deactivate Bookkeeper
+    
+    activate Aventri
+        Aventri --> Bookkeeper : attendeeInfo
+    
+        activate Bookkeeper
+            Bookkeeper -> Bookkeeper : subscription = subscribe(customer, product[])
+            note right
+                We translate the attendeeInfo
+                into a customer and product
+            end note
+            Bookkeeper -> Bookkeeper : createQuota(subscription, product[])
+            note left
+                Quotas are created for each product
+                for the customer Subject. Group
+                Subject quotas come later for
+                group resources (portals, repos, etc.)
+            end note
+        deactivate Bookkeeper
+    
+        Aventri --> Researcher : success page
+        note right
+            We need to determine if
+            Aventri supports a redirect
+            URL on success to get the 
+            researcher back to the
+            Client app.
+        end note
+    deactivate Aventri
+
+    @enduml
+    
+    
+.. image:: images/create-order.png
+    
 Charges
 -------
 
