@@ -481,6 +481,7 @@ The following sequence diagram outlines the steps needed for a client to create 
     @startuml images/create-order.png
     !include ./plantuml-styles.txt
     
+    autonumber "<font color=999999>"
     title "Small Organization Membership with two hours Consultation"
     actor Researcher
     participant Client
@@ -488,9 +489,7 @@ The following sequence diagram outlines the steps needed for a client to create 
     participant "CN" <<Service>>
     participant Aventri <<Service>>
     
-    activate Researcher
-    Researcher -> Client : opens pricing page
-    deactivate Researcher
+    Researcher o-> Client : opens pricing page
     
     activate Client
         Client -> Bookkeeper : listProducts()
@@ -584,7 +583,7 @@ The following sequence diagram outlines the steps needed for a client to create 
     activate Bookkeeper
         Bookkeeper -> Bookkeeper : attendee = new Attendee(order)
         Bookkeeper -> Aventri : createAttendee(attendee, event)
-        note right
+        note left
             The Aventri event id that
             corresponds to our Small
             Organization Membership
@@ -630,7 +629,8 @@ The following sequence diagram outlines the steps needed for a client to create 
     activate Aventri
         Aventri -> Bookkeeper : eventUpdated(eventId, attendeeId)
         note left
-            This call sequence is asynchronous,
+            The Aventri trigger callback 
+            sequence is asynchronous,
             so the researcher sees success
             immediately
         end note
@@ -642,24 +642,28 @@ The following sequence diagram outlines the steps needed for a client to create 
     
     activate Aventri
         Aventri --> Bookkeeper : attendeeInfo
+        note left
+            We translate the attendeeInfo
+            into a customer and product
+        end note
     
         activate Bookkeeper
-            Bookkeeper -> Bookkeeper : subscription = subscribe(customer, product[])
-            note right
-                We translate the attendeeInfo
-                into a customer and product
-            end note
-            Bookkeeper -> Bookkeeper : createQuota(subscription, product[])
-            note left
-                Quotas are created for each product
-                for the customer Subject. Group
-                Subject quotas come later for
-                group resources (portals, repos, etc.)
-            end note
+            Bookkeeper -> Bookkeeper : updateOrder(status = paid)
+            loop for product in products
+                Bookkeeper -> Bookkeeper : subscription = subscribe(customer, product)
+                Bookkeeper -> Bookkeeper : createQuota(subscription, product)
+                note left
+                    Quotas are created for each product
+                    for the customer Subject. Group
+                    Subject quotas are established for
+                    group resources (portals, storage, etc.)
+                    by updating the subscription.
+                end note
+            end
         deactivate Bookkeeper
     
-        Aventri --> Researcher : success page
-        note right
+        Aventri -->o Researcher : success page
+        note left
             We need to determine if
             Aventri supports a redirect
             URL on success to get the 
