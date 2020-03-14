@@ -185,10 +185,10 @@ Customer REST endpoints:
         invoicePrefix: string
         invoiceSettings: hash
         metadata: hashes
-        name: string
+        givenName: string
+        surName: string
         phone: string
-        subscriptions: list
-        taxExempt: string
+        subject: string
     }
     @enduml
 
@@ -327,7 +327,8 @@ Quota REST endpoints:
         name: string
         softLimit: integer
         hardLimit: integer
-        usage: integer
+        usages: list
+        totalUsage: integer
         unit: string
         subscriptionId: integer
         subject: string
