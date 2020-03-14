@@ -1,6 +1,7 @@
       ' change the default styles   
       skinparam shadowing false   
-      skinparam roundcorner 10
+      skinparam roundcorner 5
+      skinparam padding 2
       skinparam linetype ortho
       skinparam bbackgroundColor #000000
 
