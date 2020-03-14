@@ -7,14 +7,13 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Subscriptions``, ``Quotas``, ``Orders``, ``Invoices``, and ``Charges`` and that DataONE needs to track. This documents:
+To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Subscriptions``, ``Quotas``, ``Usages``, and ``Orders`` that DataONE needs to track. This documents:
 
 - What service ``Products`` are available for purchase
 - What ``Products`` a ``Customer`` purchased in an ``Order``
 - What ``Subscriptions`` are established for a ``Customer`` for a ``Product``
 - What ``Quota`` limits are set for ``Customers`` per ``Subscription``.
-- What ``Invoices`` have been sent for an ``Order``
-- Which payment ``Charges`` completed the ``Order``
+- What ``Usages`` are associated with a given ``Quota``
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
 
@@ -31,20 +30,18 @@ The following diagram shows the membership and payment records stored by DataONE
     }
     class Order {
     }
-    class Invoice {
-    }
-    class Charge {
-    }
     class Quota {
     }
+    class Usage {
+    }
     
+
     Customer "1" --o "n" Order : "          "
     Order "0" -right-o "n" Product : "          "
-    Order "0" -up-o "n" Charge : "          "
-    Order "0" -left-o "n" Invoice : "          "
     Customer "0" -right-o "n" Subscription : "          "
     Subscription "1" -up-o "n" Product : "          "
     Subscription "1" -right-o "n" Quota : "          "
+    Quota "1" -right-o "n" Usage : "          "
     Product "0" -right-o "n" Feature : "          "
     Feature "0" -down-o "1" Quota : "          "
     @enduml
@@ -76,10 +73,13 @@ Product REST endpoints:
         id: string
         object: string
         active: boolean
+        amount: integer
         name: string
         caption: string
-        description: string
+        currency: string
         created: timestamp
+        description: string
+        interval: string
         statementDescriptor: string
         type: string
         unitLabel: string
@@ -249,22 +249,22 @@ Subscription REST endoints:
     class Subscription {
         id: string
         object: string
-        billingCycleAnchor: timestamp
+        'billingCycleAnchor: timestamp
         canceledAt: timestamp
         collectionMethod: string
         created: timestamp
-        currentPeriodEnd: timestamp
-        currentPeriodStart: timestamp
-        customer: integer
-        daysUntilDue: integer
-        discount: hash
-        endedAt: timestamp
-        items: list
-        latestInvoice: integer
+        'currentPeriodEnd: timestamp
+        'currentPeriodStart: timestamp
+        customerId: integer
+        'daysUntilDue: integer
+        'discount: hash
+        'endedAt: timestamp
+        'items: list # use this later if needed
+        'latestInvoice: integer
         metadata: hash
-        product: integer
+        productId: integer
         quantity: integer
-        start: timestamp
+        'start: timestamp
         startDate: timestamp
         status: string
         trialEnd: timestamp
@@ -281,19 +281,12 @@ An example ``Subscription``:
     {
         "id": 10,
         "object": "subscription",
-        "billingCycleAnchor": 1568066038,
         "canceledAt": null,
         "collectionMethod": "send_invoice",
         "created": 1568066038,
-        "currentPeriodEnd": 1599602038,
-        "currentPeriodStart": 1568066038,
-        "customer": 20,
-        "daysUntilDue": 365,
-        "discount": null,
-        "endedAt": null,
-        "latestInvoice": 30,
+        "customerId": 20,
         "metadata": {},
-        "product": 2,
+        "productId": 2,
         "quantity": 1,
         "startDate": 1568066038,
         "status": "unpaid",
@@ -381,6 +374,27 @@ An example 4TB ``Quota`` with a 90% soft limit:
         "subject": "CN=budden-lab,DC=dataone,DC=org"
     }
 
+Usages
+------
+
+``Usages`` track which items use a portion of a ``Quota``.  For instance, for a ``portal_count`` quota, the object identifier of the portal document would be recorded as the instance of a portal that uses a portion of the total quota.  A ``Usage`` object is associated with one ``Quota``.
+
+..
+    @startuml images/usage.png
+    !include ./plantuml-styles.txt
+
+    class Usage {
+        id: integer
+        object: string
+        quotaId: integer
+        instanceId: integer
+        quantity: integer
+    }
+
+    @enduml
+
+.. image:: images/usage.png
+
 Orders
 ------
 
@@ -404,7 +418,7 @@ Order REST endpoints:
     !include ./plantuml-styles.txt
 
     class Order {
-        id: string
+        id: integer
         object: string
         amount: integer
         amountReturned: integer

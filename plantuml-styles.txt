@@ -2,6 +2,7 @@
       skinparam shadowing false   
       skinparam roundcorner 10
       skinparam linetype ortho
+      skinparam bbackgroundColor #000000
 
       ' style sequences
       skinparam sequence {
