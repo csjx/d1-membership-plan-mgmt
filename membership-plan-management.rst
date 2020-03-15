@@ -297,7 +297,7 @@ An example ``Subscription``:
 Quotas
 ------
 
-``Quotas`` are limits set for a particular ``Product``, such as the number of portals allowed, disk space allowed, etc. ``Quotas`` have a soft and hard limit per unit to help with communicating limit warnings.  ``Quotas`` that don't have an associated ``Subject`` are considered general product quotas used for informational display (part of a Product's ``Feature`` list).  ``Quota`` limits and other numeric values must be expressed as floating point numbers is serialized JSON form (e.g. ``"hardLimit": 1.0``). 
+``Quotas`` are limits set for a particular ``Product``, such as the number of portals allowed, disk space allowed, etc. ``Quotas`` have a soft and hard limit per unit to help with communicating limit warnings.  ``Quotas`` that don't have an associated ``Subject`` are considered general product quotas used for informational display (part of a Product's ``Feature`` list).  ``Quota`` limits and other numeric values must be expressed as floating point numbers in serialized JSON form (e.g. ``"hardLimit": 1.0``). 
 
 ``Quotas`` stored for individual ``Subject`` identifiers also include a ``usage`` field that is periodically updated to reflect the ``Subject``'s current usage of the resource, harvested from the Coordinating Node indices.
 
