@@ -322,7 +322,6 @@ Quota REST endpoints:
                                             subject=:subject&\
                                             submitterSubject=:submitterSubject&\
                                             requestedUsage=:requestedUsage
-    Quota     = createUsage():  POST    /quotas/:id/usage?usage=:usage
     Quota     = updateUsage():  PUT     /quotas/:id/usage?usage=:usage
     Quota     = deleteUsage():  DELETE  /quotas/:id/usage?usageId=:usageId
 
