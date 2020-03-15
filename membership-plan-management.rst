@@ -383,7 +383,7 @@ An example 4TB ``Quota`` with a 90% soft limit:
 Usages
 ------
 
-``Usages`` track which items use a portion of a ``Quota``.  For instance, for a ``portal_count`` quota, the object identifier of the portal document would be recorded as the instance of a portal that uses a portion of the total quota.  A ``Usage`` object is associated with one ``Quota``.
+``Usages`` track which items use a portion of a ``Quota``.  For instance, for a ``portal`` quota, the object identifier of the portal document would be recorded as the instance of a portal that uses a portion of the total quota.  A ``Usage`` object is associated with one ``Quota``.
 
 ..
     @startuml images/usage.png
@@ -393,13 +393,24 @@ Usages
         id: integer
         object: string
         quotaId: integer
-        subject: string
         instanceId: integer
         quantity: integer
     }
     @enduml
 
 .. image:: images/usage.png
+
+An example 1TB ``Usage`` instance:
+
+.. code:: json
+    
+    {
+        "id": 54321,
+        "object": "usage",
+        "quotaId": 1,
+        "instanceId": "urn:uuid:56925d4b-9e46-49ec-96ea-38dc9ed0a64c",
+        "quantity": 1099511627776.0
+    }
 
 Orders
 ------
