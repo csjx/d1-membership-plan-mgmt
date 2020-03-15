@@ -323,7 +323,7 @@ Quota REST endpoints:
                                             submitterSubject=:submitterSubject&\
                                             requestedUsage=:requestedUsage
     Quota     = updateUsage():  PUT     /quotas/:id/usage?usage=:usage
-    Quota     = deleteUsage():  DELETE  /quotas/:id/usage?usageId=:usageId
+    boolean   = deleteUsage():  DELETE  /quotas/:id/usage?usageId=:usageId
 
 ..
     @startuml images/quota.png
