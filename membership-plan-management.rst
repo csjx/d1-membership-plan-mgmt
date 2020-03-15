@@ -309,19 +309,23 @@ Quota REST endpoints:
 
 .. code::
     
-    QuotaList = listQuotas():   GET    /quotas
-    QuotaList = listQuotas():   GET    /quotas?subscriptionId=:subscriptionId
-    QuotaList = listQuotas():   GET    /quotas?subject=:subject
-    Quota     = createQuota():  POST   /quotas
-    Quota     = getQuota():     GET    /quotas/:id
-    Quota     = updateQuota():  PUT    /quotas/:id
-    boolean   = deleteQuota():  DELETE /quotas/:id
-    UsageList = listUsages():   GET    /quotas/:name/usage?subject=:subject
-    boolean   = isActive():     GET    /quotas/:name/usage?instanceId=:instanceId
-    Quota     = hasRemaining(): GET    /quotas/:name/usage/remaining?\              
+    QuotaList = listQuotas():   GET     /quotas
+    QuotaList = listQuotas():   GET     /quotas?subscriptionId=:subscriptionId
+    QuotaList = listQuotas():   GET     /quotas?subject=:subject
+    Quota     = createQuota():  POST    /quotas
+    Quota     = getQuota():     GET     /quotas/:id
+    Quota     = updateQuota():  PUT     /quotas/:id
+    boolean   = deleteQuota():  DELETE  /quotas/:id
+    UsageList = listUsages():   GET     /quotas/:name/usage?subject=:subject
+    boolean   = isActive():     GET     /quotas/:name/usage?instanceId=:instanceId
+    Quota     = hasRemaining(): GET     /quotas/:name/usage/remaining?\              
                                             subject=:subject&\
                                             submitterSubject=:submitterSubject&\
                                             requestedUsage=:requestedUsage
+    Quota     = createUsage():  POST    /quotas/:id/usage?usage=:usage
+    Quota     = updateUsage():  PUT     /quotas/:id/usage?usage=:usage
+    Quota     = deleteUsage():  DELETE  /quotas/:id/usage?usageId=:usageId
+
 ..
     @startuml images/quota.png
     !include ./plantuml-styles.txt
@@ -368,11 +372,11 @@ An example 4TB ``Quota`` with a 90% soft limit:
     
     {
         "id": 1,
-        "object":"quota",
-        "name":"archive_storage",
-        "softLimit": 3774873,
-        "hardLimit": 4194304,
-        "unit": "megabyte",
+        "object": "quota",
+        "name": "storage",
+        "softLimit": 4398046511104.0,
+        "hardLimit": 4837851162214.0,
+        "unit": "byte",
         "customerId": 2,
         "subject": "CN=budden-lab,DC=dataone,DC=org"
     }
