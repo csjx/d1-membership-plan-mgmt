@@ -309,14 +309,19 @@ Quota REST endpoints:
 
 .. code::
     
-    listQuotas():  GET    /quotas
-    listQuotas():  GET    /quotas?subscriptionId=:subscriptionId
-    listQuotas():  GET    /quotas?subject=:subject
-    createQuota(): POST   /quotas
-    getQuota():    GET    /quotas/:id
-    updateQuota(): PUT    /quotas/:id
-    deleteQuota(): DELETE /quotas/:id
-
+    QuotaList = listQuotas():   GET    /quotas
+    QuotaList = listQuotas():   GET    /quotas?subscriptionId=:subscriptionId
+    QuotaList = listQuotas():   GET    /quotas?subject=:subject
+    Quota     = createQuota():  POST   /quotas
+    Quota     = getQuota():     GET    /quotas/:id
+    Quota     = updateQuota():  PUT    /quotas/:id
+    boolean   = deleteQuota():  DELETE /quotas/:id
+    UsageList = listUsages():   GET    /quotas/:name/usage?subject=:subject
+    boolean   = isActive():     GET    /quotas/:name/usage?instanceId=:instanceId
+    Quota     = hasRemaining(): GET    /quotas/:name/usage/remaining?\              
+                                            subject=:subject&\
+                                            submitterSubject=:submitterSubject&\
+                                            requestedUsage=:requestedUsage
 ..
     @startuml images/quota.png
     !include ./plantuml-styles.txt
@@ -327,15 +332,12 @@ Quota REST endpoints:
         name: string
         softLimit: integer
         hardLimit: integer
-        usages: list
-        totalUsage: integer
+        usage: integer
         unit: string
         subscriptionId: integer
         subject: string
     }
     @enduml
-
-    Note: ``Quota`` limits and usages are typed as integers (32 bit) and not longs (64 bit) because of issues related to duck-typing text-based JSON values while unmarshalling quotas.  For this reason, storage quotas are expressed in a unit such as ``megabyte`` so that the stored number is below the max integer (2^31 -1).
 
 .. image:: images/quota.png
 
@@ -388,10 +390,10 @@ Usages
         id: integer
         object: string
         quotaId: integer
+        subject: string
         instanceId: integer
         quantity: integer
     }
-
     @enduml
 
 .. image:: images/usage.png
