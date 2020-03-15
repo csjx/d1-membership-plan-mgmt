@@ -57,13 +57,13 @@ Product REST endpoints:
 
 .. code::
     
-    listProducts():  GET    /products
-    createProduct(): POST   /products
-    getProduct():    GET    /products/:id
-    getProduct():    GET    /products?name=:name
-    getProduct():    GET    /products?description=:description
-    updateProduct(): PUT    /products/:id
-    deleteProduct(): DELETE /products/:id
+    ProductList = listProducts():  GET    /products
+    Product     = createProduct(): POST   /products
+    Product     = getProduct():    GET    /products/:id
+    Product     = getProduct():    GET    /products?name=:name
+    Product     = getProduct():    GET    /products?description=:description
+    Product     = updateProduct(): PUT    /products/:id
+    boolean     = deleteProduct(): DELETE /products/:id
 
 ..
     @startuml images/product.png
@@ -159,13 +159,13 @@ Customer REST endpoints:
 
 .. code::
     
-    listCustomers():  GET    /customers
-    createCustomer(): POST   /customers
-    getCustomer():    GET    /customers/:id
-    getCustomer():    GET    /customers?subject=:subject
-    getCustomer():    GET    /customers?email=:email
-    updateCustomer(): PUT    /customers/:id
-    deleteCustomer(): DELETE /customers/:id
+    CustomerList = listCustomers():  GET    /customers
+    Customer     = createCustomer(): POST   /customers
+    Customer     = getCustomer():    GET    /customers/:id
+    Customer     = getCustomer():    GET    /customers?subject=:subject
+    Customer     = getCustomer():    GET    /customers?email=:email
+    Customer     = updateCustomer(): PUT    /customers/:id
+    boolean      = deleteCustomer(): DELETE /customers/:id
 
 ..
     @startuml images/customer.png
@@ -234,13 +234,13 @@ Subscription REST endoints:
 
 .. code::
     
-    listSubscriptions():  GET    /subscriptions
-    listSubscriptions():  GET    /subscriptions?customerId=:customerId
-    listSubscriptions():  GET    /subscriptions?subject=:subject
-    createSubscription(): POST   /subscriptions
-    getSubscription():    GET    /subscriptions/:id
-    updateSubscription(): PUT    /subscriptions/:id
-    cancelSubscription(): DELETE /subscriptions/:id
+    SubscriptionList = listSubscriptions():  GET    /subscriptions
+    SubscriptionList = listSubscriptions():  GET    /subscriptions?customerId=:customerId
+    SubscriptionList = listSubscriptions():  GET    /subscriptions?subject=:subject
+    Subscription     = createSubscription(): POST   /subscriptions
+    Subscription     = getSubscription():    GET    /subscriptions/:id
+    Subscription     = updateSubscription(): PUT    /subscriptions/:id
+    boolean          = cancelSubscription(): DELETE /subscriptions/:id
 
 ..
     @startuml images/subscription.png
@@ -407,14 +407,14 @@ Order REST endpoints:
 
 .. code::
     
-    listOrders():  GET    /orders
-    createOrder(): POST   /orders
-    getOrder():    GET    /orders/:id
-    getOrder():    GET    /orders?subject=:subject
-    getOrder():    GET    /orders?customerId=:customerId
-    updateOrder(): PUT    /orders/:id
-    payOrder():    PUT    /orders/:id/pay
-    deleteOrder(): DELETE /orders/:id
+    OrderList = listOrders():  GET    /orders
+    Order     = createOrder(): POST   /orders
+    Order     = getOrder():    GET    /orders/:id
+    Order     = getOrder():    GET    /orders?subject=:subject
+    Order     = getOrder():    GET    /orders?customerId=:customerId
+    Order     = updateOrder(): PUT    /orders/:id
+    Order     = payOrder():    PUT    /orders/:id/pay
+    boolean   = deleteOrder(): DELETE /orders/:id
 
 ..
     @startuml images/order.png
