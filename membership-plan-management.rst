@@ -395,6 +395,7 @@ Usages
         quotaId: integer
         instanceId: integer
         quantity: integer
+        status: string
     }
     @enduml
 
@@ -409,7 +410,8 @@ An example 1TB ``Usage`` instance:
         "object": "usage",
         "quotaId": 1,
         "instanceId": "urn:uuid:56925d4b-9e46-49ec-96ea-38dc9ed0a64c",
-        "quantity": 1099511627776.0
+        "quantity": 1099511627776.0,
+        "status": "active"
     }
 
 Orders
