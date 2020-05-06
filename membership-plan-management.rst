@@ -317,7 +317,7 @@ Quota REST endpoints:
     Quota     = updateQuota():  PUT     /quotas/:id
     boolean   = deleteQuota():  DELETE  /quotas/:id
     UsageList = listUsages():   GET     /quotas/:name/usage?subject=:subject
-    boolean   = isActive():     GET     /quotas/:name/usage?instanceId=:instanceId
+    Usage     = getUsage():     GET     /quotas/:name/usage?instanceId=:instanceId
     Quota     = hasRemaining(): GET     /quotas/:name/usage/remaining?\              
                                             subject=:subject&\
                                             submitterSubject=:submitterSubject&\
@@ -333,9 +333,9 @@ Quota REST endpoints:
         id: string
         object: string
         name: string
-        softLimit: integer
-        hardLimit: integer
-        usage: integer
+        softLimit: double
+        hardLimit: double
+        usage: double
         unit: string
         subscriptionId: integer
         subject: string
@@ -393,8 +393,8 @@ Usages
         id: integer
         object: string
         quotaId: integer
-        instanceId: integer
-        quantity: integer
+        instanceId: string
+        quantity: double
         status: string
     }
     @enduml
