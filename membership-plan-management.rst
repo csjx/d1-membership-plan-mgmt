@@ -355,13 +355,11 @@ Managing Shared Quotas
 ``Quotas`` are established when a ``Customer`` enrolls for free or paid services.  ``Customers`` are their ``Subject`` identifier (e.g. their ORCID identifier), and quotas are set against this identifier.  When objects are uploaded to DataONE Member Nodes, the ``SystemMetadata.submitter`` field is used to check for quota limits.
 
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
-client applications should set the appropriate `HTTP extension header field`_ during a call to the ``MNStorage`` methods of ``create()`` and ``update``. The DataONE custom HTTP extension headers include:
+client applications should set the appropriate `HTTP extension header field`_ during a call to the ``MNStorage`` methods of ``create()``, ``update()``, and ``delete()``. The DataONE custom HTTP extension header is:
 
-- ``X-DataONE-Storage-Subject``: The ``Subject`` used to determine shared archive storage quotas.
-- ``X-DataONE-Portal-Subject``: The ``Subject`` used to determine shared branded portal quotas.
-- ``X-DataONE-Replication-Subject``: The ``Subject`` used to determine shared replication quotas.
+- ``X-DataONE-Quota-Subject``: The ``Subject`` to apply the quota usage against.
 
-The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Storage-Subject`` unless applying the storage to  the ``submitter`` ``Subject's`` quota is desired.  When uploading portal documents (i.e. with an ``https://purl.dataone.org/portals-1.0.0`` format identifier), the ``X-DataONE-Portal-Subject`` should also be included.
+The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Quota-Subject`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
 
 .. _`HTTP extension header field`: https://tools.ietf.org/html/rfc2616#section-4.2
 
