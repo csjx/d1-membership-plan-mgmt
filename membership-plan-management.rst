@@ -303,7 +303,7 @@ client applications should set the appropriate `HTTP extension header field`_ du
 
 - ``X-DataONE-Owner``: The ``Owner`` to apply the quota usage against.
 
-The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Service-Owner`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
+The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Owner`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
 
 .. _`HTTP extension header field`: https://tools.ietf.org/html/rfc2616#section-4.2
 
