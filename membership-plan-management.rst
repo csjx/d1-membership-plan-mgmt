@@ -7,12 +7,12 @@ Membership Plan Management
 Overview
 --------
 
-To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Subscriptions``, ``Quotas``, ``Usages``, and ``Orders`` that DataONE needs to track. This documents:
+To support ongoing operations, DataONE offers paid services for memberships alongside free services. This document outlines the design and implementation details needed to offer and manage these services. It describes the ``Products``, ``Customers``, ``Services``, ``Quotas``, ``Usages``, and ``Orders`` that DataONE needs to track. This documents:
 
 - What service ``Products`` are available for purchase
 - What ``Products`` a ``Customer`` purchased in an ``Order``
-- What ``Subscriptions`` are established for a ``Customer`` for a ``Product``
-- What ``Quota`` limits are set for ``Customers`` per ``Subscription``.
+- What ``Services`` are established for a ``Customer`` for a ``Product``
+- What ``Quota`` limits are set for ``Customers`` per ``Service``.
 - What ``Usages`` are associated with a given ``Quota``
 
 The following diagram shows the membership and payment records stored by DataONE and their relationships.
@@ -26,7 +26,7 @@ The following diagram shows the membership and payment records stored by DataONE
     }
     class Customer {
     }
-    class Subscription {
+    class Service {
     }
     class Order {
     }
@@ -38,9 +38,9 @@ The following diagram shows the membership and payment records stored by DataONE
 
     Customer "1" --o "n" Order : "          "
     Order "0" -right-o "n" Product : "          "
-    Customer "0" -right-o "n" Subscription : "          "
-    Subscription "1" -up-o "n" Product : "          "
-    Subscription "1" -right-o "n" Quota : "          "
+    Customer "0" -right-o "n" Service : "          "
+    Service "1" -up-o "1" Product : "          "
+    Service "1" -right-o "n" Quota : "          "
     Quota "1" -right-o "n" Usage : "          "
     Product "0" -right-o "n" Feature : "          "
     Feature "0" -down-o "1" Quota : "          "
@@ -70,7 +70,7 @@ Product REST endpoints:
     !include ./plantuml-styles.txt
 
     class Product {
-        id: string
+        id: integer
         object: string
         active: boolean
         amount: integer
@@ -95,7 +95,7 @@ An example ``Product``:
 .. code:: json
 
     {
-        "id": "725C2F79-7E0B-4018-94F3-C16D05F23CCC",
+        "id": 1,
         "object": "product",
         "active": true,
         "name": "Organization",
@@ -153,7 +153,7 @@ An example ``Product``:
 Customers
 ---------
 
-``Customers`` are identified by a DataONE account (by ORCID identifier), and are associated with ``Orders`` that they make for free or purchased ``Products``.  When an ``Order`` is completed, the ``Customer`` is associated with a ``Subscription`` which links the ordered ``Product`` to the ``Customer`` and the associated ``Quota`` limits.
+``Customers`` are identified by a DataONE account (by ORCID identifier), and are associated with ``Orders`` that they make for free or purchased ``Products``.  When an ``Order`` is completed, the ``Customer`` is associated with a ``Service`` which links the ordered ``Product`` to the ``Customer`` and the associated ``Quota`` limits.
  
 Customer REST endpoints:
 
@@ -172,7 +172,7 @@ Customer REST endpoints:
     !include ./plantuml-styles.txt
 
     class Customer {
-        id: string
+        id: integer
         object: string
         balance: integer
         address: hash
@@ -225,29 +225,29 @@ An example ``Customer``:
         "phone": "805-893-2500"
     }
     
-Subscriptions
+Services
 -------------
 
-``Subscriptions`` represent a ``Product`` that has been ordered by a ``Customer`` and is paid for on a recurring basis.  A ``Subscription`` records the creation and cancelation dates, and can  an optional ``Discount``.  They may also be the ``Quota`` defined in the subscribed  ``Product``, along with the ``Usage`` of the limited resource. 
+``Services`` represent a ``Product`` that has been ordered by a ``Customer`` and is paid for on a recurring basis.  A ``Service`` records the creation and cancelation dates, and can  an optional ``Discount``.  They may also be the ``Quota`` defined in the subscribed  ``Product``, along with the ``Usage`` of the limited resource. 
 
-Subscription REST endoints:
+Service REST endoints:
 
 .. code::
     
-    SubscriptionList = listSubscriptions():  GET    /subscriptions
-    SubscriptionList = listSubscriptions():  GET    /subscriptions?customerId=:customerId
-    SubscriptionList = listSubscriptions():  GET    /subscriptions?subject=:subject
-    Subscription     = createSubscription(): POST   /subscriptions
-    Subscription     = getSubscription():    GET    /subscriptions/:id
-    Subscription     = updateSubscription(): PUT    /subscriptions/:id
-    boolean          = cancelSubscription(): DELETE /subscriptions/:id
+    ServiceList = listServices():  GET    /services
+    ServiceList = listServices():  GET    /services?customerId=:customerId
+    ServiceList = listServices():  GET    /services?subject=:subject
+    Service     = createService(): POST   /services
+    Service     = getService():    GET    /services/:id
+    Service     = updateService(): PUT    /services/:id
+    boolean          = cancelService(): DELETE /services/:id
 
 ..
-    @startuml images/subscription.png
+    @startuml images/service.png
     !include ./plantuml-styles.txt
 
-    class Subscription {
-        id: string
+    class Service {
+        id: integer
         object: string
         'billingCycleAnchor: timestamp
         canceledAt: timestamp
@@ -272,15 +272,15 @@ Subscription REST endoints:
     }
     @enduml
 
-.. image:: images/subscription.png
+.. image:: images/service.png
 
-An example ``Subscription``:
+An example ``Service``:
 
 .. code:: json
     
     {
         "id": 10,
-        "object": "subscription",
+        "object": "service",
         "canceledAt": null,
         "collectionMethod": "send_invoice",
         "created": 1568066038,
@@ -303,42 +303,42 @@ Quotas
 
     Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
-``Quotas`` are established through ``Subscriptions``, where a ``Customer`` subscribes to ``Products``. Multiple ``Quotas`` can be associated with a given ``Subscription``.
+``Quotas`` are established through ``Services``, where a ``Customer`` subscribes to ``Products``. Multiple ``Quotas`` can be associated with a given ``Service``.
 
 Quota REST endpoints:
 
 .. code::
     
-    QuotaList = listQuotas():   GET     /quotas
-    QuotaList = listQuotas():   GET     /quotas?subscriptionId=:subscriptionId
-    QuotaList = listQuotas():   GET     /quotas?subject=:subject
+    QuotaList = listQuotas():   GET     /quotas?\
+                                            subscribers=:subscribers&\
+                                            quotaType=:quotaType&\
+                                            requestors=:requestors
     Quota     = createQuota():  POST    /quotas
     Quota     = getQuota():     GET     /quotas/:id
     Quota     = updateQuota():  PUT     /quotas/:id
     boolean   = deleteQuota():  DELETE  /quotas/:id
-    UsageList = listUsages():   GET     /quotas/:name/usage?subject=:subject
-    Usage     = getUsage():     GET     /quotas/:name/usage?instanceId=:instanceId
-    Quota     = hasRemaining(): GET     /quotas/:name/usage/remaining?\              
-                                            subject=:subject&\
-                                            submitterSubject=:submitterSubject&\
-                                            requestedUsage=:requestedUsage
-    Quota     = updateUsage():  PUT     /quotas/:id/usage?usage=:usage
-    boolean   = deleteUsage():  DELETE  /quotas/:id/usage?usageId=:usageId
+    Usage     = getUsage():     GET     /quotas/usage/:id
+    UsageList = listUsage():    GET     /quotas/usage?name=:name\
+                                            &instanceId=:instanceId&\
+                                            serviceSubject=:serviceSubject
+    Usage     = createUsage():  POST    /quotas/usage
+    Usage     = updateUsage():  PUT     /quotas/usage/:id
+    boolean   = deleteUsage():  DELETE  /quotas/usage/:id
 
 ..
     @startuml images/quota.png
     !include ./plantuml-styles.txt
 
     class Quota {
-        id: string
+        id: integer
         object: string
-        name: string
+        quotaType: string
         softLimit: double
         hardLimit: double
         usage: double
         unit: string
-        subscriptionId: integer
-        subject: string
+        serviceId: integer
+        serviceSubject: string
     }
     @enduml
 
@@ -357,9 +357,9 @@ Managing Shared Quotas
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
 client applications should set the appropriate `HTTP extension header field`_ during a call to the ``MNStorage`` methods of ``create()``, ``update()``, and ``delete()``. The DataONE custom HTTP extension header is:
 
-- ``X-DataONE-Quota-Subject``: The ``Subject`` to apply the quota usage against.
+- ``X-DataONE-Service-Subject``: The ``Subject`` to apply the quota usage against.
 
-The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Quota-Subject`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
+The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Service-Subject`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
 
 .. _`HTTP extension header field`: https://tools.ietf.org/html/rfc2616#section-4.2
 
@@ -383,15 +383,27 @@ Usages
 
 ``Usages`` track which items use a portion of a ``Quota``.  For instance, for a ``portal`` quota, the object identifier of the portal document would be recorded as the instance of a portal that uses a portion of the total quota.  A ``Usage`` object is associated with one ``Quota``.
 
+.. code::
+
+    Usage     = getUsage():     GET     /usages/:id
+    UsageList = listUsages():    GET     /usages?quotaType=:quotaType\
+                                            &instanceId=:instanceId&\
+                                            subscribers=:subscribers&\
+                                            status=:status
+    Usage     = createUsage():  POST    /usages
+    Usage     = updateUsage():  PUT     /usages/:id
+    boolean   = deleteUsage():  DELETE  /usages/:id
+
 ..
     @startuml images/usage.png
     !include ./plantuml-styles.txt
 
     class Usage {
-        id: integer
+        id: bigint
         object: string
         quotaId: integer
         instanceId: string
+        nodeId: string
         quantity: double
         status: string
     }
@@ -408,6 +420,7 @@ An example 1TB ``Usage`` instance:
         "object": "usage",
         "quotaId": 1,
         "instanceId": "urn:uuid:56925d4b-9e46-49ec-96ea-38dc9ed0a64c",
+        "nodeId": "urn:node:KNB",
         "quantity": 1099511627776.0,
         "status": "active"
     }
@@ -681,14 +694,14 @@ The following sequence diagram outlines the steps needed for a client to create 
         activate Bookkeeper
             Bookkeeper -> Bookkeeper : updateOrder(status = paid)
             loop for product in products
-                Bookkeeper -> Bookkeeper : subscription = subscribe(customer, product)
-                Bookkeeper -> Bookkeeper : createQuota(subscription, product)
+                Bookkeeper -> Bookkeeper : service = subscribe(customer, product)
+                Bookkeeper -> Bookkeeper : createQuota(service, product)
                 note left
                     Quotas are created for each product
                     for the customer Subject. Group
                     Subject quotas are established for
                     group resources (portals, storage, etc.)
-                    by updating the subscription.
+                    by updating the service.
                 end note
             end
         deactivate Bookkeeper
