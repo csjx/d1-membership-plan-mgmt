@@ -4,6 +4,8 @@
       skinparam padding 2
       skinparam linetype ortho
       skinparam bbackgroundColor #000000
+      skinparam stereotypeCBackgroundColor #C3D3E3
+    
 
       ' style sequences
       skinparam sequence {

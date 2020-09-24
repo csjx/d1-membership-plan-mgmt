@@ -11,7 +11,7 @@ To support ongoing operations, DataONE offers paid services for memberships alon
 
 - What service ``Products`` are available for purchase
 - What ``Products`` a ``Customer`` purchased in an ``Order``
-- What ``Services`` are established for a ``Customer`` for a ``Product``
+- What ``Services`` are established for a ``Customer``
 - What ``Quota`` limits are set for ``Customers`` per ``Service``.
 - What ``Usages`` are associated with a given ``Quota``
 
@@ -37,8 +37,8 @@ The following diagram shows the membership and payment records stored by DataONE
     
 
     Customer "1" --o "n" Order : "          "
+    Customer "1" -right-o "n" Service : "          "
     Order "0" -right-o "n" Product : "          "
-    Customer "0" -right-o "n" Service : "          "
     Service "1" -up-o "1" Product : "          "
     Service "1" -right-o "n" Quota : "          "
     Quota "1" -right-o "n" Usage : "          "
@@ -52,18 +52,6 @@ Products
 --------
 
 ``Products`` define the exact DataONE service offered, and describe the features of the service using the extensible ``metadata`` field.  Each ``Product`` is unique and may be part of any ``Order``, such as training or consultation ``Products``.  DataONE keeps a catalog of ``Products`` offered over time which may be listed by client applications.
-
-Product REST endpoints:
-
-.. code::
-    
-    ProductList = listProducts():  GET    /products
-    Product     = createProduct(): POST   /products
-    Product     = getProduct():    GET    /products/:id
-    Product     = getProduct():    GET    /products?name=:name
-    Product     = getProduct():    GET    /products?description=:description
-    Product     = updateProduct(): PUT    /products/:id
-    boolean     = deleteProduct(): DELETE /products/:id
 
 ..
     @startuml images/product.png
@@ -154,18 +142,6 @@ Customers
 ---------
 
 ``Customers`` are identified by a DataONE account (by ORCID identifier), and are associated with ``Orders`` that they make for free or purchased ``Products``.  When an ``Order`` is completed, the ``Customer`` is associated with a ``Service`` which links the ordered ``Product`` to the ``Customer`` and the associated ``Quota`` limits.
- 
-Customer REST endpoints:
-
-.. code::
-    
-    CustomerList = listCustomers():  GET    /customers
-    Customer     = createCustomer(): POST   /customers
-    Customer     = getCustomer():    GET    /customers/:id
-    Customer     = getCustomer():    GET    /customers?subject=:subject
-    Customer     = getCustomer():    GET    /customers?email=:email
-    Customer     = updateCustomer(): PUT    /customers/:id
-    boolean      = deleteCustomer(): DELETE /customers/:id
 
 ..
     @startuml images/customer.png
@@ -228,19 +204,7 @@ An example ``Customer``:
 Services
 -------------
 
-``Services`` represent a ``Product`` that has been ordered by a ``Customer`` and is paid for on a recurring basis.  A ``Service`` records the creation and cancelation dates, and can  an optional ``Discount``.  They may also be the ``Quota`` defined in the subscribed  ``Product``, along with the ``Usage`` of the limited resource. 
-
-Service REST endoints:
-
-.. code::
-    
-    ServiceList = listServices():  GET    /services
-    ServiceList = listServices():  GET    /services?customerId=:customerId
-    ServiceList = listServices():  GET    /services?subject=:subject
-    Service     = createService(): POST   /services
-    Service     = getService():    GET    /services/:id
-    Service     = updateService(): PUT    /services/:id
-    boolean          = cancelService(): DELETE /services/:id
+``Services`` represent an online ``Product`` that has been ordered by a ``Customer`` and is paid for on a recurring basis via invoicing.  A ``Service`` records the creation and cancelation dates, and can have an optional ``Discount``.  ``Quotas`` defined in the purchased  ``Product`` are associated with the ``Service``. 
 
 ..
     @startuml images/service.png
@@ -255,7 +219,7 @@ Service REST endoints:
         created: timestamp
         'currentPeriodEnd: timestamp
         'currentPeriodStart: timestamp
-        customerId: integer
+        customer: hash
         'daysUntilDue: integer
         'discount: hash
         'endedAt: timestamp
@@ -303,27 +267,7 @@ Quotas
 
     Note: The usage harvest schedule is to be determined, but calculating usage once per hour or once per day may be appropriate.
 
-``Quotas`` are established through ``Services``, where a ``Customer`` subscribes to ``Products``. Multiple ``Quotas`` can be associated with a given ``Service``.
-
-Quota REST endpoints:
-
-.. code::
-    
-    QuotaList = listQuotas():   GET     /quotas?\
-                                            subscribers=:subscribers&\
-                                            quotaType=:quotaType&\
-                                            requestors=:requestors
-    Quota     = createQuota():  POST    /quotas
-    Quota     = getQuota():     GET     /quotas/:id
-    Quota     = updateQuota():  PUT     /quotas/:id
-    boolean   = deleteQuota():  DELETE  /quotas/:id
-    Usage     = getUsage():     GET     /quotas/usage/:id
-    UsageList = listUsage():    GET     /quotas/usage?name=:name\
-                                            &instanceId=:instanceId&\
-                                            serviceSubject=:serviceSubject
-    Usage     = createUsage():  POST    /quotas/usage
-    Usage     = updateUsage():  PUT     /quotas/usage/:id
-    boolean   = deleteUsage():  DELETE  /quotas/usage/:id
+``Quotas`` are established through ``Services`` that are established after a ``Customer`` purchases ``Products``. Multiple ``Quotas`` can be associated with a given ``Service``.
 
 ..
     @startuml images/quota.png
@@ -357,9 +301,9 @@ Managing Shared Quotas
 In the case of shared quotas where a resource (like storage) is to be applied to a group of users,
 client applications should set the appropriate `HTTP extension header field`_ during a call to the ``MNStorage`` methods of ``create()``, ``update()``, and ``delete()``. The DataONE custom HTTP extension header is:
 
-- ``X-DataONE-Service-Subject``: The ``Subject`` to apply the quota usage against.
+- ``X-DataONE-Owner``: The ``Owner`` to apply the quota usage against.
 
-The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Service-Subject`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
+The value of the above extension header for each object should be set to the DataONE group identifier of the shared quota (e.g. ``CN=budden-lab,DC=dataone,DC=org``).  Typically, all calls to ``create()`` or ``update()`` should include the ``X-DataONE-Service-Owner`` unless applying the storage to the ``submitter`` ``Subject's`` quota is desired.
 
 .. _`HTTP extension header field`: https://tools.ietf.org/html/rfc2616#section-4.2
 
@@ -382,17 +326,6 @@ Usages
 ------
 
 ``Usages`` track which items use a portion of a ``Quota``.  For instance, for a ``portal`` quota, the object identifier of the portal document would be recorded as the instance of a portal that uses a portion of the total quota.  A ``Usage`` object is associated with one ``Quota``.
-
-.. code::
-
-    Usage     = getUsage():     GET     /usages/:id
-    UsageList = listUsages():    GET     /usages?quotaType=:quotaType\
-                                            &instanceId=:instanceId&\
-                                            subscribers=:subscribers&\
-                                            status=:status
-    Usage     = createUsage():  POST    /usages
-    Usage     = updateUsage():  PUT     /usages/:id
-    boolean   = deleteUsage():  DELETE  /usages/:id
 
 ..
     @startuml images/usage.png
@@ -429,19 +362,6 @@ Orders
 ------
 
 ``Orders`` track ``Customer`` purchases of a list of ``Products``, and the total amount of the ``Order`` that was charged in a ``Charge``.  Orders may be associated with an ``Invoice`` reminder for payment.  
-
-Order REST endpoints:
-
-.. code::
-    
-    OrderList = listOrders():  GET    /orders
-    Order     = createOrder(): POST   /orders
-    Order     = getOrder():    GET    /orders/:id
-    Order     = getOrder():    GET    /orders?subject=:subject
-    Order     = getOrder():    GET    /orders?customerId=:customerId
-    Order     = updateOrder(): PUT    /orders/:id
-    Order     = payOrder():    PUT    /orders/:id/pay
-    boolean   = deleteOrder(): DELETE /orders/:id
 
 ..
     @startuml images/order.png
@@ -694,7 +614,7 @@ The following sequence diagram outlines the steps needed for a client to create 
         activate Bookkeeper
             Bookkeeper -> Bookkeeper : updateOrder(status = paid)
             loop for product in products
-                Bookkeeper -> Bookkeeper : service = subscribe(customer, product)
+                Bookkeeper -> Bookkeeper : service = createService(customer, product)
                 Bookkeeper -> Bookkeeper : createQuota(service, product)
                 note left
                     Quotas are created for each product
